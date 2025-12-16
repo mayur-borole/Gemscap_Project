@@ -1,0 +1,257 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Trading Terminal Dark Theme */
+    --background: 222 47% 6%;
+    --foreground: 210 40% 96%;
+
+    --card: 222 41% 10%;
+    --card-foreground: 210 40% 96%;
+
+    --popover: 222 47% 8%;
+    --popover-foreground: 210 40% 96%;
+
+    --primary: 168 84% 42%;
+    --primary-foreground: 222 47% 6%;
+
+    --secondary: 222 41% 16%;
+    --secondary-foreground: 210 40% 96%;
+
+    --muted: 222 41% 14%;
+    --muted-foreground: 215 20% 55%;
+
+    --accent: 168 84% 42%;
+    --accent-foreground: 222 47% 6%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 222 41% 18%;
+    --input: 222 41% 18%;
+    --ring: 168 84% 42%;
+
+    --radius: 0.75rem;
+
+    /* Custom Trading Colors */
+    --chart-cyan: 168 84% 48%;
+    --chart-purple: 270 70% 60%;
+    --chart-orange: 25 95% 53%;
+    --chart-green: 142 76% 45%;
+    --chart-red: 0 72% 51%;
+    --chart-yellow: 45 93% 47%;
+
+    /* Alert Colors */
+    --alert-success: 142 76% 36%;
+    --alert-warning: 38 92% 50%;
+    --alert-danger: 0 72% 51%;
+
+    /* Glow Effects */
+    --glow-primary: 168 84% 42%;
+    --glow-cyan: 180 100% 50%;
+
+    /* Gradient Stops */
+    --gradient-start: 222 47% 8%;
+    --gradient-end: 222 47% 4%;
+
+    /* Sidebar */
+    --sidebar-background: 222 47% 8%;
+    --sidebar-foreground: 210 40% 96%;
+    --sidebar-primary: 168 84% 42%;
+    --sidebar-primary-foreground: 222 47% 6%;
+    --sidebar-accent: 222 41% 14%;
+    --sidebar-accent-foreground: 210 40% 96%;
+    --sidebar-border: 222 41% 18%;
+    --sidebar-ring: 168 84% 42%;
+  }
+
+  .dark {
+    --background: 222 47% 6%;
+    --foreground: 210 40% 96%;
+    --card: 222 41% 10%;
+    --card-foreground: 210 40% 96%;
+    --popover: 222 47% 8%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 168 84% 42%;
+    --primary-foreground: 222 47% 6%;
+    --secondary: 222 41% 16%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 222 41% 14%;
+    --muted-foreground: 215 20% 55%;
+    --accent: 168 84% 42%;
+    --accent-foreground: 222 47% 6%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 222 41% 18%;
+    --input: 222 41% 18%;
+    --ring: 168 84% 42%;
+    --sidebar-background: 222 47% 8%;
+    --sidebar-foreground: 210 40% 96%;
+    --sidebar-primary: 168 84% 42%;
+    --sidebar-primary-foreground: 222 47% 6%;
+    --sidebar-accent: 222 41% 14%;
+    --sidebar-accent-foreground: 210 40% 96%;
+    --sidebar-border: 222 41% 18%;
+    --sidebar-ring: 168 84% 42%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Monospace for numbers */
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@layer components {
+  /* Card glow effect */
+  .card-glow {
+    @apply relative;
+    box-shadow: 
+      0 0 0 1px hsl(var(--border)),
+      0 4px 24px -8px hsl(var(--primary) / 0.15),
+      inset 0 1px 0 hsl(var(--foreground) / 0.03);
+  }
+
+  .card-glow:hover {
+    box-shadow: 
+      0 0 0 1px hsl(var(--primary) / 0.3),
+      0 8px 32px -8px hsl(var(--primary) / 0.25),
+      inset 0 1px 0 hsl(var(--foreground) / 0.05);
+  }
+
+  /* Primary button glow */
+  .btn-glow {
+    box-shadow: 
+      0 0 20px hsl(var(--primary) / 0.3),
+      inset 0 1px 0 hsl(var(--foreground) / 0.1);
+  }
+
+  .btn-glow:hover {
+    box-shadow: 
+      0 0 30px hsl(var(--primary) / 0.5),
+      inset 0 1px 0 hsl(var(--foreground) / 0.15);
+  }
+
+  /* Gradient backgrounds */
+  .bg-gradient-terminal {
+    background: linear-gradient(
+      180deg,
+      hsl(var(--gradient-start)) 0%,
+      hsl(var(--gradient-end)) 100%
+    );
+  }
+
+  .bg-gradient-hero {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--background)) 0%,
+      hsl(222 47% 10%) 50%,
+      hsl(var(--primary) / 0.08) 100%
+    );
+  }
+
+  /* Chart container styling */
+  .chart-container {
+    @apply bg-card/50 rounded-lg p-4;
+    background: linear-gradient(
+      145deg,
+      hsl(var(--card) / 0.8) 0%,
+      hsl(var(--card) / 0.4) 100%
+    );
+  }
+
+  /* Metric pulse animation */
+  .metric-pulse {
+    animation: metricPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes metricPulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 8px hsl(var(--primary) / 0);
+    }
+  }
+
+  /* Alert glow */
+  .alert-glow-danger {
+    animation: alertGlow 1.5s ease-in-out infinite;
+  }
+
+  @keyframes alertGlow {
+    0%, 100% {
+      box-shadow: 0 0 10px hsl(var(--alert-danger) / 0.3);
+    }
+    50% {
+      box-shadow: 0 0 25px hsl(var(--alert-danger) / 0.6);
+    }
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+
+  /* Grid line pattern for charts */
+  .grid-pattern {
+    background-image: 
+      linear-gradient(hsl(var(--border) / 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border) / 0.3) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+}
+
+@layer utilities {
+  /* Text gradients */
+  .text-gradient-primary {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(
+      135deg,
+      hsl(var(--primary)) 0%,
+      hsl(168 84% 60%) 100%
+    );
+  }
+
+  /* Number highlight colors */
+  .text-positive {
+    color: hsl(var(--chart-green));
+  }
+
+  .text-negative {
+    color: hsl(var(--chart-red));
+  }
+
+  .text-neutral {
+    color: hsl(var(--muted-foreground));
+  }
+}

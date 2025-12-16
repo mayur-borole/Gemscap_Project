@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #0f0; }
+        .log { margin: 5px 0; padding: 5px; background: #2a2a2a; border-left: 3px solid #0f0; }
+        .error { border-left-color: #f00; color: #f00; }
+        .success { border-left-color: #0f0; }
+        h2 { color: #0ff; }
+    </style>
+</head>
+<body>
+    <h1> GEMSCAP WebSocket Diagnostic</h1>
+    <h2>Backend Health:</h2>
+    <div id="health"></div>
+    <h2>WebSocket Connections:</h2>
+    <div id="wsStatus"></div>
+    <h2>Live Data:</h2>
+    <div id="logs"></div>
+    
+    <script>
+        const log = (msg, isError = false) => {
+            const div = document.createElement('div');
+            div.className = 'log ' + (isError ? 'error' : 'success');
+            div.textContent = new Date().toLocaleTimeString() + ' - ' + msg;
+            document.getElementById('logs').prepend(div);
+        };
+        
+        // Check backend health
+        fetch('http://localhost:8000/api/health')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('health').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                log(' Backend health check passed');
+            })
+            .catch(e => {
+                document.getElementById('health').innerHTML = '<div class="error">' + e + '</div>';
+                log(' Backend health check failed: ' + e, true);
+            });
+        
+        // Connect to WebSockets
+        const wsUrls = {
+            prices: 'ws://localhost:8000/ws/prices',
+            spread: 'ws://localhost:8000/ws/spread',
+            correlation: 'ws://localhost:8000/ws/correlation',
+            summary: 'ws://localhost:8000/ws/summary',
+            alerts: 'ws://localhost:8000/ws/alerts'
+        };
+        
+        const statusDiv = document.getElementById('wsStatus');
+        Object.entries(wsUrls).forEach(([name, url]) => {
+            const ws = new WebSocket(url);
+            const status = document.createElement('div');
+            status.className = 'log';
+            status.textContent = name + ': Connecting...';
+            statusDiv.appendChild(status);
+            
+            ws.onopen = () => {
+                status.textContent = name + ':  Connected';
+                status.className = 'log success';
+                log(' WebSocket ' + name + ' connected');
+            };
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                log(' ' + name + ': ' + JSON.stringify(data).substring(0, 100) + '...');
+            };
+            
+            ws.onerror = (error) => {
+                status.textContent = name + ':  Error';
+                status.className = 'log error';
+                log(' WebSocket ' + name + ' error: ' + error, true);
+            };
+            
+            ws.onclose = () => {
+                status.textContent = name + ':  Closed';
+                log(' WebSocket ' + name + ' closed', true);
+            };
+        });
+    </script>
+</body>
+</html>
