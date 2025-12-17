@@ -1,5 +1,10 @@
 # GEMSCAP - Real-Time Quantitative Trading Analytics Platform
 
+**#Tip:**
+When you start the project, please wait for 1–2 minutes. Initially, it may show that the backend is not connected, but this is expected. The backend takes some time to initialize, and after a short delay, the application runs properly.
+
+**LINK OF PROJECT :** https://gemscap-project-u117.vercel.app/
+
 [![Demo Video](thumbnail.png)](https://github.com/user-attachments/assets/deb71be3-73d0-456f-ad65-e41f2bba5458)
 
 > **Statistical Arbitrage & Mean Reversion Trading System**  
