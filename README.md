@@ -1,18 +1,7 @@
-# Real-Time Quantitative Analytics Platform
+# GEMSCAP - Real-Time Quantitative Trading Analytics Platform
 
-## Overview
-
-This project implements a real-time quantitative analytics system focused on pair trading and mean-reversion research. It ingests live market data from cryptocurrency exchanges, performs statistical analysis, and presents insights through an interactive dashboard designed for research and monitoring.
-
-## Problem Being Solved
-
-Quantitative researchers need to:
-- Monitor relationships between correlated assets in real time
-- Detect statistically meaningful deviations from historical norms
-- Evaluate whether those deviations are reliable enough to investigate further
-- Understand context around signals without being overwhelmed by raw numbers
-
-This system addresses these needs by combining live data ingestion, standard quantitative analytics, and contextual interpretation of signals in a single workflow.
+> **Statistical Arbitrage & Mean Reversion Trading System**  
+> Full-stack fintech application for real-time crypto market analysis, spread trading, and correlation monitoring with live Binance data streaming.
 
 ## Architecture
 
