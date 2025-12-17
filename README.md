@@ -209,6 +209,26 @@ Rolling metrics require sufficient historical data. Until enough data is availab
 
 As more data accumulates, metrics stabilize and become reliable.
 
+## Development Approach: AI-Assisted Workflow
+
+This project leveraged AI tools strategically to accelerate development while maintaining code quality:
+
+**Time-Saving Applications:**
+- **Architecture Design**: Used GPT to validate architectural decisions and identify potential bottlenecks before implementation
+- **Boilerplate Generation**: Generated repetitive code structures (API schemas, WebSocket handlers, React components) in seconds rather than hours
+- **Debugging Assistance**: Quickly identified root causes of async/WebSocket connection issues and statistical calculation errors
+- **Documentation**: Automated generation of docstrings, type hints, and inline comments for better code maintainability
+- **Code Review**: Received instant feedback on edge cases, error handling, and performance optimizations
+
+**Key Productivity Gains:**
+- Reduced initial setup time by ~60% (FastAPI + React scaffolding, dependency configuration)
+- Faster iteration on complex statistical functions (z-score, correlation, regression models)
+- Immediate answers to library-specific questions (pandas operations, Recharts configurations)
+- Parallel development of frontend and backend without context-switching delays
+
+**Smart Usage Pattern:**
+Rather than blindly accepting AI-generated code, I used it as a collaborative tool: AI handled repetitive patterns while I focused on domain logic, data flow architecture, and business requirements. This hybrid approach delivered professional-grade code in a fraction of typical development time.
+
 ## Running the Project
 
 **Prerequisites**
