@@ -1,5 +1,7 @@
 # GEMSCAP - Real-Time Quantitative Trading Analytics Platform
 
+[![Demo Video](thumbnail.png)](https://github.com/user-attachments/assets/deb71be3-73d0-456f-ad65-e41f2bba5458)
+
 > **Statistical Arbitrage & Mean Reversion Trading System**  
 > Full-stack fintech application for real-time crypto market analysis, spread trading, and correlation monitoring with live Binance data streaming.
 
