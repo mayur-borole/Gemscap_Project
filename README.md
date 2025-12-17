@@ -3,53 +3,7 @@
 > **Statistical Arbitrage & Mean Reversion Trading System**  
 > Full-stack fintech application for real-time crypto market analysis, spread trading, and correlation monitoring with live Binance data streaming.
 
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                      SYSTEM ARCHITECTURE                        │
-└─────────────────────────────────────────────────────────────────┘
-
-    [Binance WebSocket]
-            │
-            ▼
-    ┌────────────────┐
-    │   Ingestion    │  ← Tick data buffering
-    │     Layer      │
-    └────────────────┘
-            │
-            ▼
-    ┌────────────────┐
-    │   Resampling   │  ← OHLCV aggregation
-    │     Layer      │     Time alignment
-    └────────────────┘
-            │
-            ▼
-    ┌────────────────┐
-    │   Analytics    │  ← Spread calculation
-    │     Engine     │     Z-score, correlation
-    └────────────────┘     Regression analysis
-            │
-            ▼
-    ┌────────────────┐
-    │     Alert      │  ← Threshold monitoring
-    │     Engine     │     Signal interpretation
-    └────────────────┘
-            │
-            ▼
-    ┌────────────────┐
-    │  WebSocket +   │  ← Real-time broadcast
-    │   REST APIs    │     Data export
-    └────────────────┘
-            │
-            ▼
-    ┌────────────────┐
-    │   Dashboard    │  ← Charts, controls
-    │   (React UI)   │     Alert panel
-    └────────────────┘
-
-         Data flows from top to bottom
-```
+![image alt](https://github.com/mayur-borole/Gemscap_Project/blob/aa663df572cb5e7273a2b6236f1965cd474c46ca/Artitecture%20of%20project.png)
 
 ## Architectural Principles
 
