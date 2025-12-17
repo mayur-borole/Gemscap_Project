@@ -20,6 +20,8 @@ class Settings(BaseSettings):
         "http://localhost:8083",
         "http://localhost:5173",
         "http://localhost:3000",
+        "https://gemscap-project-u117.vercel.app",
+        "https://*.vercel.app",
     ]
     
     # Binance Configuration
