@@ -1,565 +1,277 @@
-# GEMSCAP - Real-Time Quantitative Trading Analytics Platform
+# Real-Time Quantitative Analytics Platform
 
-> **Statistical Arbitrage & Mean Reversion Trading System**  
-> Full-stack fintech application for real-time crypto market analysis, spread trading, and correlation monitoring with live Binance data streaming.
+## Overview
 
-## 📐 Architecture Overview
+This project implements a real-time quantitative analytics system focused on pair trading and mean-reversion research. It ingests live market data from cryptocurrency exchanges, performs statistical analysis, and presents insights through an interactive dashboard designed for research and monitoring.
+
+## Problem Being Solved
+
+Quantitative researchers need to:
+- Monitor relationships between correlated assets in real time
+- Detect statistically meaningful deviations from historical norms
+- Evaluate whether those deviations are reliable enough to investigate further
+- Understand context around signals without being overwhelmed by raw numbers
+
+This system addresses these needs by combining live data ingestion, standard quantitative analytics, and contextual interpretation of signals in a single workflow.
+
+## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                    FINTECH SYSTEM ARCHITECTURE                              │
-│                     Data Flow and Components                                │
-└─────────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                      SYSTEM ARCHITECTURE                        │
+└─────────────────────────────────────────────────────────────────┘
 
-┌─────────────────────────┐
-│   DATA INGESTION        │
-│                         │
-│  ┌──────────────────┐   │
-│  │ Binance WebSocket│   │
-│  └──────────────────┘   │
-│  ┌──────────────────┐   │      ┌──────────────────────┐
-│  │ Tick Ingestion   │───┼─────▶│                      │
-│  │     Layer        │   │      │                      │
-│  └──────────────────┘   │      │    PROCESSING        │
-└─────────────────────────┘      │                      │
-                                 │  ┌────────────────┐  │
-┌─────────────────────────┐      │  │ Resampling/    │  │
-│    PROCESSING           │      │  │    OHLCV       │  │
-│                         │      │  └────────────────┘  │
-│  ┌──────────────────┐   │      │  ┌────────────────┐  │
-│  │ Resampling/      │   │      │  │   Analytics    │  │
-│  │    OHLCV         │   │◀─────┤  │    Engine      │  │
-│  └──────────────────┘   │      │  └────────────────┘  │
-│  ┌──────────────────┐   │      │  ┌────────────────┐  │
-│  │   Analytics      │───┼──────┤  │  Alert Engine  │  │
-│  │    Engine        │   │      │  └────────────────┘  │
-│  └──────────────────┘   │      └──────────────────────┘
-│  ┌──────────────────┐   │               │
-│  │  Alert Engine    │   │               │
-│  └──────────────────┘   │               ▼
-└─────────────────────────┘      ┌──────────────────────┐
-                                 │   DISTRIBUTION       │
-┌─────────────────────────┐      │                      │
-│   DISTRIBUTION          │      │  ┌────────────────┐  │
-│                         │      │  │   WebSocket    │  │
-│  ┌──────────────────┐   │      │  │  Broadcaster   │  │
-│  │   WebSocket      │   │◀─────┤  └────────────────┘  │
-│  │  Broadcaster     │   │      │  ┌────────────────┐  │
-│  └──────────────────┘   │      │  │   REST APIs    │  │
-│  ┌──────────────────┐   │      │  └────────────────┘  │
-│  │   REST APIs      │───┼──────┘                      │
-│  └──────────────────┘   │               │             │
-└─────────────────────────┘               │             │
-                                          ▼             │
-┌─────────────────────────┐      ┌──────────────────────┘
-│   VISUALIZATION         │      │
-│                         │      │
-│  ┌──────────────────┐   │      │  ┌────────────────────────┐
-│  │ Control Panel    │   │      │  │  FINTECH SYSTEM        │
-│  └──────────────────┘   │      │  │   ARCHITECTURE         │
-│  ┌──────────────────┐   │◀─────┘  └────────────────────────┘
-│  │ WebSocket Client │   │
-│  └──────────────────┘   │
-│  ┌──────────────────┐   │
-│  │ State Management │   │
-│  └──────────────────┘   │
-│  ┌──────────────────┐   │
-│  │     Charts       │   │
-│  └──────────────────┘   │
-│  ┌──────────────────┐   │
-│  │  Alert Panel     │   │
-│  └──────────────────┘   │
-│  ┌──────────────────┐   │
-│  │ Data Export      │   │
-│  │    Trigger       │   │
-│  └──────────────────┘   │
-└─────────────────────────┘
+    [Binance WebSocket]
+            │
+            ▼
+    ┌────────────────┐
+    │   Ingestion    │  ← Tick data buffering
+    │     Layer      │
+    └────────────────┘
+            │
+            ▼
+    ┌────────────────┐
+    │   Resampling   │  ← OHLCV aggregation
+    │     Layer      │     Time alignment
+    └────────────────┘
+            │
+            ▼
+    ┌────────────────┐
+    │   Analytics    │  ← Spread calculation
+    │     Engine     │     Z-score, correlation
+    └────────────────┘     Regression analysis
+            │
+            ▼
+    ┌────────────────┐
+    │     Alert      │  ← Threshold monitoring
+    │     Engine     │     Signal interpretation
+    └────────────────┘
+            │
+            ▼
+    ┌────────────────┐
+    │  WebSocket +   │  ← Real-time broadcast
+    │   REST APIs    │     Data export
+    └────────────────┘
+            │
+            ▼
+    ┌────────────────┐
+    │   Dashboard    │  ← Charts, controls
+    │   (React UI)   │     Alert panel
+    └────────────────┘
 
-                Flow: Data Ingestion → Processing → Distribution → Visualization
+         Data flows from top to bottom
 ```
 
-## 🎯 Overview
+## Architectural Principles
 
-GEMSCAP is a professional-grade quantitative trading analytics platform that streams real-time cryptocurrency price data from Binance, performs statistical analysis for spread trading and mean reversion strategies, and provides interactive visualizations through a modern web dashboard.
+**Clear Separation of Concerns**  
+Ingestion, resampling, analytics, and presentation are isolated into separate modules with well-defined interfaces.
 
-**Key Capabilities:**
-- Real-time market data ingestion from Binance Futures WebSocket
-- Multi-asset correlation and spread analysis
-- Z-score based mean reversion signal generation
-- Configurable threshold-based alert system
-- Live charting with dual Y-axis for multi-asset comparison
-- Export analytics data in CSV, JSON, and Parquet formats
+**Frontend-Backend Decoupling**  
+The frontend interacts only through WebSocket and REST endpoints. It does not directly access raw data sources or internal state.
 
----
+**Pluggable Components**  
+Data providers and storage mechanisms can be replaced with minimal changes. The system does not depend on specific exchange APIs beyond the ingestion layer.
 
-## 🏗️ System Architecture
+**Minimal Necessary Complexity**  
+No distributed message queues, microservices orchestration, or complex infrastructure were introduced. The architecture reflects the actual requirements of the system: real-time data processing and research-oriented presentation.
 
-The platform follows a modular microservices architecture with four core layers:
+## Methodology
 
-### **1. Data Ingestion Layer**
-**Components:** Binance WebSocket → Tick Ingestion Layer
+The project was built incrementally, ensuring each component worked correctly before moving to the next.
 
-- Connects to Binance Futures WebSocket API (`wss://fstream.binance.com/stream`)
-- Ingests real-time tick data for multiple trading pairs (BTC, ETH, SOL)
-- Buffers up to 10,000 ticks per symbol in memory
-- Thread-safe tick aggregation with asyncio support
+**Step 1: Live Market Data Streaming**  
+First, a WebSocket connection to Binance Futures was established to stream tick data for multiple assets (BTC, ETH, SOL). At this stage, the system only focused on reliably receiving and buffering data without performing analytics. Keeping ingestion lightweight ensures minimal delay and no dropped ticks when the stream is active.
 
-**Key Files:**
-- `BackEnd/app/binance_client.py` - WebSocket client implementation
-- `BackEnd/app/ingestion.py` - Tick buffering and management
+**Step 2: Data Storage and Time Alignment**  
+Incoming raw tick data is buffered in memory with a capacity limit. For analysis, this raw data is resampled into fixed time intervals (1s, 1m, 5m, 15m, 1h) and aligned across assets. All subsequent calculations are performed on this resampled, time-aligned data to ensure statistical metrics remain stable and comparable across different timeframes.
 
----
+**Step 3: Core Analytics Implementation**  
+Once the data pipeline was stable, core analytics were implemented using standard quantitative techniques:
+- Hedge ratio estimation using Ordinary Least Squares (OLS) regression
+- Spread computation between asset pairs
+- Rolling z-score calculation to measure deviation from the mean
+- Rolling correlation to assess relationship strength
+- Multiple regression methods (OLS, TLS, RANSAC, Huber) for robustness testing
 
-### **2. Processing Layer**
-**Components:** Resampling/OHLCV → Analytics Engine → Alert Engine
+All analytics are implemented as stateless functions that operate on resampled data, making them easy to test and reuse.
 
-#### **Resampling Module**
-- Aggregates tick data into OHLCV candles (1s, 1m, 5m, 15m, 1h)
-- Finalizes incomplete bars on interval boundaries
-- Supports dynamic timeframe switching
+**Step 4: Interpretation and Alerting**  
+Rather than displaying raw numbers alone, an interpretation layer was added. The system explains what current signals indicate and highlights conditions that deserve attention:
+- Z-score extremes (potential mean reversion opportunities)
+- Correlation breakdown (relationship weakening)
+- Volatility spikes (possible regime change)
+- Alert cooldown mechanisms prevent notification spam
 
-#### **Analytics Engine**
-- **Spread Calculation**: Computes price spreads between asset pairs
-- **Z-Score Analysis**: Statistical measure for mean reversion signals (threshold: ±2.0σ)
-- **Correlation**: Rolling correlation between trading pairs (window: 60 periods)
-- **Volatility**: Rolling standard deviation for risk assessment
-- **Regression**: OLS, TLS, RANSAC, Huber methods for spread modeling
+These alerts are informational and designed to support research monitoring, not automated decision-making.
 
-#### **Alert Engine**
-- Real-time threshold monitoring:
-  - Z-Score Breach (>±2.0σ) → ALERT
-  - Z-Score Warning (>±1.6σ) → WARNING
-  - Low Correlation (<0.5) → WARNING
-  - High Volatility (>1000) → WARNING
-- Cooldown mechanism (60 seconds) to prevent alert spam
-- Toast notifications + persistent alert panel
+**Step 5: Interactive Dashboard**  
+Everything is presented through an interactive web dashboard built with React. The interface is separated into logical sections:
+- Control panel for selecting assets, timeframes, and thresholds
+- Price charts showing multi-asset comparisons with dual y-axes
+- Spread and z-score visualization with threshold bands
+- Correlation charts and summary statistics
+- Alert panel displaying active notifications
+- Data export functionality for further analysis
 
-**Key Files:**
-- `BackEnd/app/resampling.py` - OHLCV aggregation
-- `BackEnd/app/minute_bar_finalizer.py` - Bar finalization logic
-- `BackEnd/app/analytics.py` - Statistical computations
-- `BackEnd/app/alerts.py` - Alert evaluation system
+Changing inputs like asset pairs or rolling windows updates analytics in real time, making the dashboard suitable for exploratory research.
 
----
+## Technology Stack
 
-### **3. Distribution Layer**
-**Components:** WebSocket Broadcaster → REST APIs
+**Language**  
+Python 3.10+  
+Chosen for its strong ecosystem in data processing, statistics, and rapid prototyping.
 
-#### **WebSocket Streams** (6 channels)
-| Endpoint | Purpose | Update Rate |
-|----------|---------|-------------|
-| `/ws/prices` | Real-time price updates | ~1 sec |
-| `/ws/spread` | Spread & Z-score data | ~1 sec |
-| `/ws/correlation` | Correlation analysis | ~1 sec |
-| `/ws/summary` | Summary statistics | ~1 sec |
-| `/ws/alerts` | Alert notifications | Event-driven |
-| `/ws/analytics` | Unified analytics stream | ~1 sec |
+**Market Data Ingestion**  
+WebSocket connection to Binance Futures  
+`asyncio`, `websockets`  
+Chosen to support:
+- Low-latency streaming data
+- Event-driven ingestion architecture
+- Non-blocking concurrent operations
 
-#### **REST APIs**
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/health` | GET | Backend health check |
-| `/api/settings` | POST | Update analysis parameters |
-| `/api/alerts` | GET | Fetch alert history |
-| `/api/export` | GET | Export data (CSV/JSON/Parquet) |
+**Analytics**  
+`pandas`, `numpy` for data manipulation  
+`scikit-learn` for regression methods  
+`statsmodels` for statistical tests  
+Chosen to implement:
+- Regression-based hedge ratios
+- Rolling statistics (mean, std, correlation)
+- Multiple regression techniques for robustness
 
-**Key Files:**
-- `BackEnd/app/websocket_manager.py` - WebSocket connection manager
-- `BackEnd/app/main.py` - FastAPI REST endpoints
+All analytics are implemented as stateless functions for clarity and reuse.
 
----
+**Backend Framework**  
+FastAPI with Uvicorn  
+Chosen because:
+- Native async support for WebSocket broadcasting
+- Automatic API documentation
+- Type validation with Pydantic
+- Lightweight and fast for real-time applications
 
-### **4. Visualization Layer**
-**Components:** Control Panel → WebSocket Client → State Management → Charts → Alert Panel → Data Export
+**Frontend**  
+React 18 with TypeScript  
+Vite for build tooling  
+Recharts for visualization  
+Chosen because:
+- Component-based architecture matches the modular design
+- TypeScript provides type safety for real-time data handling
+- Recharts offers interactive, research-grade visualizations
+- Vite enables fast development iteration
 
-#### **Control Panel**
-Interactive settings interface:
-- **Comparison Pair Selection**: Choose 2 assets for spread analysis (default: BTC/ETH)
-- **Timeframe**: 1s, 1m, 5m, 15m, 1h intervals
-- **Rolling Window**: 5-100 periods for statistical calculations
-- **Regression Type**: OLS, TLS, RANSAC, Huber
-- **Thresholds**:
-  - Z-Score: ±1.0 to ±4.0σ (default: ±2.0σ)
-  - Correlation: 0.1 to 1.0 (default: 0.5)
-  - Volatility: 100 to 5000 (default: 1000)
-- **Live Toggle**: Pause/resume data streaming
+The frontend is intentionally research-oriented, not designed as a production trading interface.
 
-#### **Charts**
-1. **Price Charts**: Multi-asset line chart with dual Y-axes
-   - Left axis: BTC (>$50k range)
-   - Right axis: ETH, SOL (<$50k range)
-   - Interactive brush for time range selection
-   - Shows 3 assets: BTC (green), ETH (purple), SOL (orange)
+## Analytics Implemented
 
-2. **Spread & Z-Score Chart**: Dual-axis visualization
-   - Purple line: Raw spread between selected pair
-   - Orange line: Z-score with threshold bands
-   - Shaded regions indicate alert zones
+**Hedge Ratio (OLS Regression)**  
+Estimates the linear relationship between two assets using ordinary least squares, a standard approach in statistical arbitrage. The hedge ratio determines the relative position sizes for spread construction.
 
-3. **Correlation Chart**: Rolling correlation heatmap
-   - Real-time correlation coefficient (-1 to +1)
-   - Color-coded zones for relationship strength
+**Spread**  
+Computed as the residual between hedged assets: `Spread = Asset1 - (HedgeRatio × Asset2)`. This represents deviations from the historical relationship.
 
-#### **Summary Cards**
-Live metrics dashboard:
-- Latest prices for all symbols
-- Current spread value
-- Z-score with trend indicator
-- Correlation coefficient
+**Rolling Z-Score**  
+Measures how many standard deviations the spread is from its recent mean over a configurable window. Used to identify statistically significant deviations:
+- Z-score > +2.0: Spread overextended (potential reversion)
+- Z-score < -2.0: Spread underextended (potential reversion)
 
-#### **Alert Panel**
-- Displays active alerts with severity badges (danger/warning/info)
-- Dismissible alert cards with timestamp
-- Real-time toast notifications for new alerts
-- Auto-refresh when conditions trigger
+**Rolling Correlation**  
+Evaluates the stability of the asset relationship over time. Low correlation indicates the pair relationship may be breaking down, reducing signal reliability.
 
-#### **Data Export**
-One-click export functionality:
-- **CSV**: Text format for Excel/spreadsheets
-- **JSON**: Structured data for APIs
-- **Parquet**: Compressed columnar format for data analysis
-- Exports last 1000 records with timestamp
+**Multiple Regression Methods**  
+In addition to OLS, the system supports:
+- Total Least Squares (TLS): Accounts for errors in both variables
+- RANSAC: Robust to outliers
+- Huber Regression: Reduces influence of outliers
 
-**Key Files:**
-- `FrontEnd/src/pages/Index.tsx` - Main dashboard orchestration
-- `FrontEnd/src/components/dashboard/ControlPanel.tsx` - Settings UI
-- `FrontEnd/src/components/dashboard/PriceChart.tsx` - Price visualization
-- `FrontEnd/src/components/dashboard/SpreadZScoreChart.tsx` - Statistical charts
-- `FrontEnd/src/components/dashboard/CorrelationChart.tsx` - Correlation display
-- `FrontEnd/src/components/dashboard/AlertsPanel.tsx` - Alert management
-- `FrontEnd/src/components/dashboard/ExportPanel.tsx` - Data export UI
-- `FrontEnd/src/services/api.ts` - WebSocket & REST API client
+These alternatives provide diagnostic tools to assess model robustness.
 
----
+## Alerting & Interpretation
 
-## 🚀 Quick Start
+**Alerts Implemented**  
+- Z-score extremes (>±2.0σ by default, configurable)
+- Correlation breakdown (<0.5 by default)
+- Spread volatility spikes (unusual standard deviation)
+- Alert cooldown (60 seconds) to prevent spam
 
-### Prerequisites
-- **Backend**: Python 3.10+
-- **Frontend**: Node.js 18+ or Bun
-- **OS**: Windows, macOS, or Linux
+**Interpretation Layer**  
+Numerical signals are accompanied by:
+- Qualitative explanations of what the signal implies
+- Confidence assessment based on correlation strength
+- Guidance on what conditions to monitor next
 
-### 1. Start Backend Server
+This avoids prescriptive trading advice while improving interpretability for researchers.
 
+## Frontend Design Philosophy
+
+The dashboard is designed as an internal research tool:
+- Split views for prices, signals, and diagnostics
+- Compact summary cards for quick context
+- Minimal styling focused on clarity and information density
+- Interactive controls for exploratory analysis
+
+The goal is to reflect how quantitative analytics are consumed in practice, not to replicate retail trading platforms.
+
+## Handling of Data Limitations
+
+Rolling metrics require sufficient historical data. Until enough data is available:
+- Some calculated fields may show NaN values
+- The UI communicates these conditions explicitly
+- The system gracefully handles incomplete data without crashing
+
+As more data accumulates, metrics stabilize and become reliable.
+
+## Running the Project
+
+**Prerequisites**
+- Python 3.10+
+- Node.js 18+ or Bun
+- Windows, macOS, or Linux
+
+**Backend Setup**
 ```bash
 cd BackEnd
+python -m venv venv
+
+# Activate virtual environment
+venv\Scripts\activate      # Windows
+source venv/bin/activate   # macOS / Linux
+
 pip install -r requirements.txt
 python run.py
 ```
 
-**Expected Output:**
-```
-INFO:     Started server process
-INFO:     Uvicorn running on http://0.0.0.0:8000
-✅ Binance WebSocket connected
-✅ Analytics engine started
-```
+The backend will start on `http://localhost:8000`. You should see log messages indicating successful connection to Binance WebSocket.
 
-Backend runs on: `http://localhost:8000`
-
-### 2. Start Frontend Dashboard
-
+**Frontend Setup**
 ```bash
 cd FrontEnd
 npm install
 npm run dev
 ```
 
-**Expected Output:**
-```
-VITE v5.4.19  ready in 1200 ms
-
-➜  Local:   http://localhost:8082/
-➜  Network: use --host to expose
-```
-
-Frontend runs on: `http://localhost:8082`
-
-### 3. Access Dashboard
-
-Open your browser and navigate to:
-```
-http://localhost:8082
-```
-
-You should see:
-- ✅ Backend Connected (green notification)
-- Live price charts with BTC, ETH, SOL
-- Real-time spread and correlation data
-- Summary statistics updating every second
-
----
-
-## 📊 Usage Guide
-
-### Analyzing Spread Trading Opportunities
-
-1. **Select Asset Pair**: In the Control Panel, click 2 assets for comparison (e.g., BTC + ETH)
-2. **Set Timeframe**: Choose analysis interval (recommended: 1m for short-term, 15m for swing)
-3. **Adjust Rolling Window**: Set statistical window (default: 20 periods)
-4. **Monitor Z-Score**: Watch the orange line in Spread & Z-Score chart
-   - **>+2.0σ**: Overextended spread, potential mean reversion SHORT
-   - **<-2.0σ**: Underextended spread, potential mean reversion LONG
-   - **±0.0σ**: Spread at historical mean
-5. **Check Correlation**: Verify pair relationship strength (>0.5 recommended)
-6. **Wait for Alerts**: System automatically triggers when thresholds breached
-
-### Customizing Alert Thresholds
-
-- **Z-Score Threshold**: Adjust sensitivity for mean reversion signals
-  - Lower (1.0-1.5σ): More frequent signals, higher false positives
-  - Higher (2.5-4.0σ): Fewer signals, higher confidence
-- **Correlation Threshold**: Set minimum acceptable correlation (0.5-0.8 typical)
-- **Volatility Threshold**: Alert on unusual market turbulence (500-2000 range)
-
-### Exporting Analytics Data
-
-1. Navigate to **Data Export** panel
-2. Click desired format:
-   - **CSV**: For Excel analysis
-   - **JSON**: For API integration
-   - **Parquet**: For Python/pandas analysis
-3. File downloads automatically with timestamp
-4. Contains last 1000 price records with all computed metrics
-
----
-
-## 🛠️ Technical Stack
-
-### Backend
-| Component | Technology | Purpose |
-|-----------|------------|---------|
-| Framework | FastAPI 0.109.0 | REST API & WebSocket server |
-| WebSocket | websockets 12.0 | Binance data streaming |
-| Analytics | NumPy, pandas | Statistical computations |
-| Regression | scikit-learn | Spread modeling (OLS/RANSAC/Huber) |
-| Validation | Pydantic | Data schemas & type safety |
-| Server | Uvicorn | ASGI production server |
-
-### Frontend
-| Component | Technology | Purpose |
-|-----------|------------|---------|
-| Framework | React 18 + TypeScript | UI components & type safety |
-| Build Tool | Vite 5.4.19 | Fast development & bundling |
-| Charts | Recharts | Interactive data visualization |
-| UI Library | shadcn/ui + Tailwind CSS | Modern component design |
-| Animation | Framer Motion | Smooth transitions |
-| State | React Hooks (useState, useEffect) | Real-time data management |
-| WebSocket | Native WebSocket API | Backend connectivity |
-
----
-
-## 📂 Project Structure
-
-```
-Gemscap/
-├── BackEnd/
-│   ├── app/
-│   │   ├── main.py                  # FastAPI application entry point
-│   │   ├── websocket_manager.py     # WebSocket connection manager
-│   │   ├── binance_client.py        # Binance WebSocket client
-│   │   ├── ingestion.py             # Tick data ingestion & buffering
-│   │   ├── resampling.py            # OHLCV candle aggregation
-│   │   ├── minute_bar_finalizer.py  # Minute bar completion logic
-│   │   ├── analytics.py             # Statistical analysis engine
-│   │   ├── alerts.py                # Alert evaluation & notification
-│   │   ├── schemas.py               # Pydantic data models
-│   │   └── settings.py              # Configuration management
-│   ├── requirements.txt             # Python dependencies
-│   ├── run.py                       # Server launcher
-│   └── README.md                    # Backend documentation
-│
-├── FrontEnd/
-│   ├── src/
-│   │   ├── pages/
-│   │   │   └── Index.tsx            # Main dashboard page
-│   │   ├── components/
-│   │   │   └── dashboard/
-│   │   │       ├── ControlPanel.tsx          # Settings sidebar
-│   │   │       ├── PriceChart.tsx            # Multi-asset price chart
-│   │   │       ├── SpreadZScoreChart.tsx     # Spread & Z-score visualization
-│   │   │       ├── CorrelationChart.tsx      # Correlation display
-│   │   │       ├── AlertsPanel.tsx           # Alert notifications
-│   │   │       ├── SummaryStats.tsx          # Metric cards
-│   │   │       └── ExportPanel.tsx           # Data export controls
-│   │   ├── services/
-│   │   │   └── api.ts               # WebSocket & REST API client
-│   │   └── lib/
-│   │       └── utils.ts             # Helper functions
-│   ├── package.json                 # Node dependencies
-│   └── vite.config.ts               # Build configuration
-│
-└── README.md                        # This file
-```
-
----
-
-## 🔧 Configuration
-
-### Backend Settings (`BackEnd/app/settings.py`)
-
-```python
-# Trading Pairs
-DEFAULT_SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT"]
-BASE_SYMBOL = "BTCUSDT"      # Primary asset for spread
-HEDGE_SYMBOL = "ETHUSDT"     # Hedge asset for spread
-
-# Timeframes
-RESAMPLE_INTERVALS = ["1s", "1m", "5m", "15m", "1h"]
-DEFAULT_INTERVAL = "1m"
-
-# Analytics
-ROLLING_WINDOW = 20                 # Statistical window
-Z_SCORE_THRESHOLD = 2.0             # Alert threshold
-CORRELATION_WINDOW = 60             # Correlation periods
-
-# Alerts
-ALERT_COOLDOWN_SECONDS = 60         # Min time between same alert
-MAX_ALERTS = 100                    # Alert history size
-
-# WebSocket
-WS_HEARTBEAT_INTERVAL = 30          # Ping interval (seconds)
-BATCH_PUBLISH_INTERVAL = 1.0        # Data broadcast rate (seconds)
-```
-
-### Frontend Environment (`.env`)
-
-```bash
-VITE_API_URL=http://localhost:8000
-VITE_WS_URL=ws://localhost:8000
-```
-
----
-
-## 🧪 Testing
-
-### Backend Health Check
-```bash
-curl http://localhost:8000/api/health
-```
-
-**Expected Response:**
-```json
-{
-  "status": "healthy",
-  "binance_connected": true,
-  "active_symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT"],
-  "websocket_clients": 1
-}
-```
-
-### WebSocket Connection Test
-```javascript
-const ws = new WebSocket('ws://localhost:8000/ws/analytics');
-ws.onmessage = (event) => console.log(JSON.parse(event.data));
-```
-
-### Export API Test
-```bash
-curl "http://localhost:8000/api/export?format=csv&interval=1m&limit=100" > data.csv
-```
-
----
-
-## 📈 Performance Metrics
-
-- **Latency**: <100ms from Binance tick to frontend display
-- **Data Rate**: ~1 update/second per WebSocket stream
-- **Memory**: ~200MB backend, ~50MB frontend
-- **CPU**: <5% on modern processors during normal operation
-- **Concurrent Users**: Supports 100+ WebSocket connections
-- **Data Retention**: Last 10,000 ticks per symbol in memory
-
----
-
-## 🔒 Security Considerations
-
-- **No API Keys Required**: Read-only public Binance WebSocket (no authentication needed)
-- **CORS**: Configured for localhost development (restrict in production)
-- **WebSocket**: No authentication (add JWT tokens for production deployment)
-- **Data Privacy**: No user data stored, all analytics computed in real-time
-- **Rate Limiting**: Binance WebSocket has built-in limits (handled automatically)
-
----
-
-## 🐛 Troubleshooting
-
-### Backend won't start
-```bash
-# Check Python version
-python --version  # Should be 3.10+
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Check port availability
-netstat -an | findstr 8000  # Windows
-lsof -i :8000  # macOS/Linux
-```
-
-### Frontend shows "Backend not connected"
-1. Verify backend is running: `curl http://localhost:8000/api/health`
-2. Check browser console for WebSocket errors (F12)
-3. Verify CORS settings in `BackEnd/app/settings.py`
-4. Restart both backend and frontend
-
-### Charts not updating
-1. Check browser console for WebSocket connection status
-2. Verify Binance WebSocket connection in backend logs
-3. Ensure symbols are configured correctly
-4. Try clearing browser cache and refresh
-
-### No alerts appearing
-1. Wait for Z-score to breach threshold (>±2.0σ)
-2. Check alert cooldown period (60 seconds between duplicates)
-3. Verify threshold settings in Control Panel
-4. Check browser console for WebSocket `/ws/alerts` messages
-
----
-
-## 🚀 Deployment (Production)
-
-### Backend
-```bash
-# Use production ASGI server
-pip install gunicorn
-gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
-```
-
-### Frontend
-```bash
-# Build for production
-npm run build
-
-# Serve static files (Nginx/Apache/Vercel)
-# Output: dist/
-```
-
-### Environment Variables
-```bash
-# Backend
-export API_HOST=0.0.0.0
-export API_PORT=8000
-export CORS_ORIGINS=https://yourdomain.com
-
-# Frontend
-VITE_API_URL=https://api.yourdomain.com
-VITE_WS_URL=wss://api.yourdomain.com
-```
-
----
-
-## 📚 References
-
-- [Binance Futures WebSocket API](https://binance-docs.github.io/apidocs/futures/en/)
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [Recharts Documentation](https://recharts.org/)
-- [Statistical Arbitrage Strategy](https://en.wikipedia.org/wiki/Statistical_arbitrage)
-- [Z-Score Mean Reversion](https://www.investopedia.com/terms/z/z-score.asp)
-
----
-
-
----
-
-**Built with ❤️ for quantitative traders and market analysts**
+The frontend will start on `http://localhost:8082`. Open this URL in your browser to access the dashboard.
+
+**What You Should See**
+- Real-time price updates for BTC, ETH, SOL
+- Spread and z-score charts updating continuously
+- Correlation metrics
+- Alert notifications when thresholds are breached
+
+## Key Files
+
+**Backend**
+- [BackEnd/app/main.py](BackEnd/app/main.py) - FastAPI application and REST endpoints
+- [BackEnd/app/binance_client.py](BackEnd/app/binance_client.py) - WebSocket client for market data
+- [BackEnd/app/ingestion.py](BackEnd/app/ingestion.py) - Tick data buffering
+- [BackEnd/app/resampling.py](BackEnd/app/resampling.py) - OHLCV candle aggregation
+- [BackEnd/app/analytics.py](BackEnd/app/analytics.py) - Statistical analysis functions
+- [BackEnd/app/alerts.py](BackEnd/app/alerts.py) - Alert evaluation logic
+- [BackEnd/app/websocket_manager.py](BackEnd/app/websocket_manager.py) - WebSocket broadcast manager
+
+**Frontend**
+- [FrontEnd/src/pages/Index.tsx](FrontEnd/src/pages/Index.tsx) - Main dashboard
+- [FrontEnd/src/components/dashboard/ControlPanel.tsx](FrontEnd/src/components/dashboard/ControlPanel.tsx) - Settings controls
+- [FrontEnd/src/components/dashboard/PriceChart.tsx](FrontEnd/src/components/dashboard/PriceChart.tsx) - Price visualization
+- [FrontEnd/src/components/dashboard/SpreadZScoreChart.tsx](FrontEnd/src/components/dashboard/SpreadZScoreChart.tsx) - Statistical charts
+- [FrontEnd/src/components/dashboard/AlertsPanel.tsx](FrontEnd/src/components/dashboard/AlertsPanel.tsx) - Alert display
+- [FrontEnd/src/services/api.ts](FrontEnd/src/services/api.ts) - WebSocket and REST client
