@@ -1,7 +1,7 @@
 # GEMSCAP - Real-Time Quantitative Trading Analytics Platform
 
 **#Tip:**
-When you start the project, please wait for 1–2 minutes. Initially, it may show that the backend is not connected, but this is expected. The backend takes some time to initialize, and after a short delay, the application runs properly.
+When you start the project, please wait for 1 minute. Initially, it may show that the backend is not connected, but this is expected. The backend takes little time to initialize, and after a very short delay, the application runs properly.
 
 **LINK OF PROJECT :** https://gemscap-project-u117.vercel.app/
 
